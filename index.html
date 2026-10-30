@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>สมุดคะแนน</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f4;--card:#fff;--tx:#14213d;--mut:#66728a;--pri:#0f766e;--acc:#f59e0b;--ok:#15803d;--bad:#dc2626;--bd:#e1e7e5;--sh:0 4px 20px rgba(20,33,61,.06);--dirty:#fef3c7}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1a1a;--card:#152524;--tx:#eaf3f1;--mut:#92a7a3;--pri:#2dd4bf;--bd:#243a38;--sh:none;--dirty:#4a3a10}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Prompt,'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--tx);display:flex;min-height:100vh;font-size:15px}
+.mut{color:var(--mut)}
+#side{width:250px;flex:none;background:var(--card);border-right:1px solid var(--bd);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-weight:600;font-size:19px;padding:4px 10px 14px}
+.grp{font-size:12px;color:var(--mut);margin:16px 10px 4px;font-weight:500}
+.nav{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;background:none;color:var(--tx);padding:9px 12px;border-radius:10px;font:inherit;cursor:pointer;text-align:left}
+.nav:hover{background:var(--bg)}.nav.on{background:var(--pri);color:#fff}.nav small{opacity:.7}.ms{display:none}
+.add{width:100%;margin-top:14px;border:1.5px dashed var(--bd);background:none;color:var(--mut);padding:9px;border-radius:10px;font:inherit;cursor:pointer}
+main{flex:1;min-width:0;padding:26px 30px 100px}
+h1{margin:0;font-size:25px;font-weight:600}h2{margin:0 0 14px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;justify-content:space-between}
+.tabs{display:flex;gap:4px;background:var(--card);padding:4px;border-radius:12px;border:1px solid var(--bd);width:max-content;max-width:100%;overflow:auto}
+.tabs button{border:0;background:none;padding:8px 16px;border-radius:9px;font:inherit;color:var(--mut);cursor:pointer;white-space:nowrap}
+.tabs .on{background:var(--tx);color:var(--bg)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:var(--sh)}
+.pad{padding:16px}.click{cursor:pointer}.click:hover{border-color:var(--pri)}
+.btn{border:0;border-radius:10px;padding:9px 16px;font:inherit;cursor:pointer;background:var(--pri);color:#fff}
+@media(prefers-color-scheme:dark){.btn{color:#042f2e}}
+.btn.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}.btn.r{background:var(--bad);color:#fff}.btn:disabled{opacity:.5}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;width:100%}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.tw{overflow:auto;max-height:70vh}
+table{border-collapse:separate;border-spacing:0;width:100%}
+th,td{padding:7px 12px;border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
+th{position:sticky;top:0;background:var(--card);z-index:3;font-weight:500;font-size:13px}
+.sk{position:sticky;left:0;background:var(--card);z-index:1}th.sk{z-index:4}
+td input.s{width:76px;text-align:center;padding:6px}
+td input.s.d{background:var(--dirty)}td input.s.bad{outline:2px solid var(--bad);background:#fee2e2;color:#7f1d1d}
+.lk{color:var(--pri);cursor:pointer;font-size:12px;font-weight:400}
+.sb{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:5px 13px;border-radius:8px;font:inherit;cursor:pointer}
+.sb.on{color:#fff;border-color:transparent}.sb.s0.on{background:#16a34a}.sb.s1.on{background:#d97706}.sb.s2.on{background:#2563eb}.sb.s3.on{background:#dc2626}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.thumb{height:150px;background:var(--bg) center/cover;border-radius:13px 13px 0 0;display:grid;place-items:center;font-size:34px}
+.big{font-size:34px;font-weight:600;margin:8px 0 2px;color:var(--pri)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stats b{display:block;font-size:26px;font-weight:600}
+.bar{width:110px;height:8px;border-radius:5px;background:var(--bd);display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri)}
+.empty{padding:44px 20px;text-align:center}
+.chk{display:flex;align-items:center;gap:6px;color:var(--mut)}
+#bar{position:fixed;left:50%;bottom:22px;transform:translate(-50%,140%);transition:.25s;background:var(--tx);color:var(--bg);padding:10px 12px 10px 20px;border-radius:14px;display:flex;gap:12px;align-items:center;z-index:20;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#bar.show{transform:translate(-50%,0)}
+#m{position:fixed;inset:0;background:rgba(10,20,30,.5);display:none;place-items:center;z-index:30;padding:16px}#m.show{display:grid}
+.box{width:100%;max-width:520px;max-height:92vh;overflow:auto;padding:22px}
+.f{margin-bottom:12px}.f label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.acts{display:flex;gap:8px;margin-top:16px}
+#pv img{max-width:100%;border-radius:10px;margin-top:10px;display:block}
+#t{position:fixed;top:18px;right:18px;background:var(--ok);color:#fff;padding:10px 16px;border-radius:10px;z-index:40;opacity:0;pointer-events:none;transition:.2s}
+#t.show{opacity:1}#t.e{background:var(--bad)}
+@media(max-width:800px){body{flex-direction:column}#side{width:auto;height:auto;position:static;display:flex;gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--bd);padding:10px}.brand,.grp{display:none}.nav{white-space:nowrap;width:auto}.ms{display:inline}.add{width:auto;margin:0;white-space:nowrap}main{padding:16px 14px 100px}}
+</style></head>
+<body>
+<div id="side"></div>
+<main id="main"><p class="mut">กำลังโหลดข้อมูลจาก Google Sheet…</p></main>
+<div id="bar"><span></span><button class="btn g" onclick="discard()">ยกเลิก</button><button class="btn" id="sv" onclick="saveAll()">บันทึกทั้งหมด</button></div>
+<div id="m"></div><div id="t"></div>
+<script>
+const $=s=>document.querySelector(s),P=n=>(+n).toLocaleString('th-TH',{maximumFractionDigits:1});
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S,cur=null,tab='score',dirty={},sc={},q='',allm=false;
+const ST=['มา','สาย','ลา','ขาด'],att={};
+let amode='day',adate='',cs={},adt=false;
+const GAS=typeof google!=='undefined'&&!!google.script;
+const ls={get:k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+const api=(fn,...a)=>GAS?new Promise((ok,no)=>google.script.run.withSuccessHandler(ok).withFailureHandler(e=>{toast(e.message||String(e),1);no(e)})[fn](...a)):remote(fn,a);
+function askCfg(){return new Promise(ok=>{modal(`<h2>เชื่อมต่อ Google Sheet</h2><div class="f"><label>Web app URL จาก Apps Script (ลงท้ายด้วย /exec)</label><input id="cu" value="${esc(ls.get('gb_url'))}"></div><div class="f"><label>รหัสผ่าน (ค่า APP_PASSWORD)</label><input id="cp" type="password"></div><div class="acts"><span style="flex:1"></span><button class="btn" id="cok">เชื่อมต่อ</button></div>`);
+$('#cok').onclick=()=>{const u=$('#cu').value.trim(),p=$('#cp').value;if(!u||!p)return toast('กรุณากรอกให้ครบ',1);ls.set('gb_url',u);ls.set('gb_pw',p);closeM();ok()}})}
+async function remote(fn,a){if(!ls.get('gb_url')||!ls.get('gb_pw'))await askCfg();
+try{const r=await fetch(ls.get('gb_url'),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn:fn,args:a,pw:ls.get('gb_pw')})}),j=await r.json();
+if(!j.ok){if(j.error=='unauthorized'){ls.del('gb_pw');throw new Error('รหัสผ่านไม่ถูกต้อง')}throw new Error(j.error)}return j.data}
+catch(e){toast(e.name=='TypeError'?'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบ URL และสิทธิ์ Anyone':e.message,1);throw e}}
+const cls=id=>S.classes.find(c=>c.id==id),stu=id=>S.students.filter(s=>s.classId==id).sort((a,b)=>a.no-b.no),
+asg=id=>S.assignments.filter(a=>a.classId==id).sort((a,b)=>(a.date>b.date)-(a.date<b.date)),lab=c=>c?c.subject+' ห้อง '+c.room:'';
+const toast=(m,e)=>{const t=$('#t');t.textContent=m;t.className='show'+(e?' e':'');clearTimeout(toast.h);toast.h=setTimeout(()=>t.className='',2800)};
+const empty=(t,s)=>`<div class="card empty"><div style="font-size:38px">📭</div><b>${t}</b><div class="mut">${s||''}</div></div>`;
+const DRV='https:\x2f\x2fdrive.google.com/',thumb=(id,w)=>DRV+'thumbnail?id='+id+'&sz=w'+w;
+async function load(){
+  const wd=!GAS?0:setTimeout(()=>{if(!S)$('#main').innerHTML=empty('ใช้เวลานานผิดปกติ','ตรวจสอบว่าสคริปต์ผูกกับ Google Sheet และ Deploy เวอร์ชันล่าสุดแล้ว')},15000);
+  try{S=JSON.parse(await api('getAll'));
+  S.classes.forEach(c=>{c.id=String(c.id);c.room=String(c.room);c.subject=String(c.subject)});
+  S.students.forEach(s=>{s.no=+s.no;s.code=String(s.code);s.classId=String(s.classId)});
+  S.assignments.forEach(a=>{a.max=+a.max;a.id=String(a.id);a.classId=String(a.classId)});
+  S.scores.forEach(r=>sc[r.asgId+'|'+r.code]=+r.score);
+  (S.attendance||[]).forEach(r=>att[r.classId+'|'+r.date+'|'+r.code]=r.status);adate=today();render()}
+  catch(e){clearTimeout(wd);$('#main').innerHTML=empty('โหลดข้อมูลไม่สำเร็จ',esc(e&&e.message||e))+`<p style="text-align:center"><button class="btn" onclick="load()">ลองใหม่</button></p>`}}
+function render(){side();main()}
+function side(){const g={};S.classes.forEach(c=>(g[c.subject]=g[c.subject]||[]).push(c));
+$('#side').innerHTML=`<div class="brand">📘 สมุดคะแนน</div><button class="nav ${cur?'':'on'}" onclick="go(null)">ภาพรวม</button>`+
+Object.keys(g).map(s=>`<div class="grp">${esc(s)}</div>`+g[s].map(c=>`<button class="nav ${cur==c.id?'on':''}" onclick="go('${c.id}')"><span><span class="ms">${esc(c.subject)} </span>ห้อง ${esc(c.room)}</span><small>${stu(c.id).length} คน</small></button>`).join('')).join('')+
+`<button class="add" onclick="classModal()">＋ เพิ่มวิชา/ห้อง</button>`+(GAS?'':`<button class="add" onclick="askCfg().then(load)">ตั้งค่าการเชื่อมต่อ</button>`)}
+function guard(){if(Object.keys(dirty).length||adt){if(!confirm('มีข้อมูลที่ยังไม่บันทึก ต้องการทิ้งการเปลี่ยนแปลงหรือไม่?'))return false;dirty={};adt=false;bar()}return true}
+function go(id){if(!guard())return;cur=id;tab='score';render()}
+function setTab(t){if(!guard())return;tab=t;main()}
+function totals(cid){const A=asg(cid),mx=A.reduce((s,a)=>s+a.max,0);
+return stu(cid).map(s=>{const t=A.reduce((x,a)=>x+(sc[a.id+'|'+s.code]||0),0);return Object.assign({},s,{t,mx,p:mx?t/mx*100:0})})}
+function main(){const m=$('#main');if(!cur){return home(m)}const c=cls(cur);
+m.innerHTML=`<div class="top"><div><h1>${esc(c.subject)} · ห้อง ${esc(c.room)}</h1><div class="mut">${stu(cur).length} คน · ${asg(cur).length} ใบงาน</div></div><div style="display:flex;gap:8px"><button class="btn g" onclick="exportM()">ส่งออก CSV</button><button class="btn g" onclick="classModal('${c.id}')">แก้ไขวิชา/ห้อง</button></div></div>
+<div class="tabs">${[['score','ลงคะแนน'],['att','เช็คเวลาเรียน'],['work','คลังใบงาน'],['sum','สรุปคะแนน'],['stu','รายชื่อนักเรียน']].map(([k,v])=>`<button class="${tab==k?'on':''}" onclick="setTab('${k}')">${v}</button>`).join('')}</div><div id="body" style="margin-top:16px"></div>`;
+({score:scoreV,att:attV,work:workV,sum:sumV,stu:stuV})[tab]()}
+function home(m){if(!S.classes.length)return m.innerHTML=empty('เริ่มต้นด้วยการเพิ่มวิชาและห้องแรก','กดปุ่มด้านล่างเพื่อสร้าง')+`<p style="text-align:center"><button class="btn" onclick="classModal()">＋ เพิ่มวิชา/ห้อง</button></p>`;
+m.innerHTML=`<div class="top"><div><h1>ภาพรวม</h1><div class="mut">${S.classes.length} วิชา/ห้อง · ${S.students.length} นักเรียน · ${S.assignments.length} ใบงาน</div></div><button class="btn g" onclick="exportM()">ส่งออก CSV</button></div><div class="grid">`+S.classes.map(c=>{const T=totals(c.id),av=T.length?T.reduce((s,x)=>s+x.p,0)/T.length:0;
+return `<div class="card pad click" onclick="go('${c.id}')"><b>${esc(c.subject)}</b><div class="mut">ห้อง ${esc(c.room)}</div><div class="big">${P(av)}%</div><div class="mut" style="font-size:13px">เฉลี่ยทั้งห้อง · ${T.length} คน · ${asg(c.id).length} ใบงาน</div></div>`}).join('')+`<div class="card pad click mut" style="display:grid;place-items:center;border-style:dashed" onclick="classModal()">＋ เพิ่มวิชา/ห้อง</div></div>`}
+
+function scoreV(){const A=asg(cur),T=stu(cur),b=$('#body');
+if(!T.length)return b.innerHTML=empty('ยังไม่มีรายชื่อนักเรียน','ไปที่แท็บ "รายชื่อนักเรียน" แล้ววางรายชื่อ');
+if(!A.length)return b.innerHTML=empty('ยังไม่มีใบงาน','ไปที่แท็บ "คลังใบงาน" เพื่อสร้างใบงานก่อนลงคะแนน');
+b.innerHTML=`<div class="card tw"><table id="gt"><thead><tr><th>เลขที่</th><th class="sk">ชื่อ-สกุล</th>${A.map(a=>`<th>${esc(a.title)}<br><span class="mut">เต็ม ${a.max}</span> <a class="lk" onclick="fillA('${a.id}')">เติมเต็ม</a></th>`).join('')}<th>รวม</th><th>ร้อยละ</th></tr></thead><tbody>${T.map((s,i)=>`<tr><td>${s.no}</td><td class="sk">${esc(s.name)}</td>${A.map((a,k)=>{const v=sc[a.id+'|'+s.code];return `<td><input class="s" data-a="${a.id}" data-c="${esc(s.code)}" data-r="${i}" data-k="${k}" data-m="${a.max}" value="${v==null?'':v}" inputmode="decimal"></td>`}).join('')}<td><b id="t${i}"></b></td><td id="p${i}" class="mut"></td></tr>`).join('')}</tbody></table></div>
+<div class="mut" style="margin:10px 4px;font-size:13px">กด Enter เพื่อลงคะแนนคนถัดไป · คัดลอกคอลัมน์จาก Excel/Sheets มาวางได้ทีเดียวหลายคน · ช่องว่างหมายถึงยังไม่มีคะแนน</div>`;
+const g=$('#gt'),at=(r,k)=>g.querySelector(`input[data-r="${r}"][data-k="${k}"]`);
+g.oninput=e=>{mark(e.target);rowT(+e.target.dataset.r)};
+g.onkeydown=e=>{const x=e.target;if(['Enter','ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();const n=at(+x.dataset.r+(e.key=='ArrowUp'||e.shiftKey?-1:1),x.dataset.k);if(n){n.focus();n.select()}}};
+g.onpaste=e=>{const t=e.clipboardData.getData('text');if(!/[\n\t]/.test(t.trim()))return;e.preventDefault();const x=e.target;
+t.trim().split(/\r?\n/).forEach((ln,i)=>ln.split('\t').forEach((v,j)=>{const n=at(+x.dataset.r+i,+x.dataset.k+j);if(n){n.value=v.trim();mark(n)}}));T.forEach((_,i)=>rowT(i))};
+T.forEach((_,i)=>rowT(i))}
+function rowT(i){let t=0,m=0;document.querySelectorAll(`#gt input[data-r="${i}"]`).forEach(x=>{t+=+x.value||0;m+=+x.dataset.m});$('#t'+i).textContent=P(t);$('#p'+i).textContent=m?P(t/m*100)+'%':''}
+function mark(x){const key=x.dataset.a+'|'+x.dataset.c,v=x.value.trim(),old=sc[key],same=(v===''&&old==null)||(v!==''&&+v===old),bad=v!==''&&(isNaN(+v)||+v<0||+v>+x.dataset.m);
+x.classList.toggle('bad',bad);x.classList.toggle('d',!same&&!bad);
+if(same)delete dirty[key];else dirty[key]={asgId:x.dataset.a,code:x.dataset.c,score:v===''?'':+v,bad};bar()}
+function bar(){const n=Object.keys(dirty).length;$('#bar').className=n?'show':'';$('#bar span').textContent=`เปลี่ยนแปลง ${n} ช่อง`}
+function fillA(id){const T=stu(cur);document.querySelectorAll(`#gt input[data-a="${id}"]`).forEach(x=>{if(x.value.trim()===''){x.value=x.dataset.m;mark(x)}});T.forEach((_,i)=>rowT(i))}
+function discard(){dirty={};bar();scoreV()}
+async function saveAll(){const L=Object.values(dirty);if(L.some(x=>x.bad))return toast('มีคะแนนที่ไม่ถูกต้อง (ไม่ใช่ตัวเลข หรือเกินคะแนนเต็ม)',1);
+$('#sv').disabled=true;try{await api('saveScores',L.map(({asgId,code,score})=>({asgId,code,score})));
+L.forEach(x=>{const k=x.asgId+'|'+x.code;if(x.score==='')delete sc[k];else sc[k]=x.score});dirty={};
+document.querySelectorAll('#gt input.d').forEach(x=>x.classList.remove('d'));bar();toast(`บันทึก ${L.length} ช่องแล้ว`)}catch(e){}$('#sv').disabled=false}
+
+function workV(){$('#body').innerHTML=`<div class="top"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;flex:1"><input id="q" placeholder="ค้นหาชื่อใบงาน หมายเหตุ หรือวิชา" value="${esc(q)}" style="max-width:340px"><label class="chk"><input type="checkbox" id="al" ${allm?'checked':''} style="width:auto"> ค้นทุกวิชา/ห้อง</label></div><button class="btn" onclick="asgModal()">＋ ใบงานใหม่</button></div><div id="wl"></div>`;
+$('#q').oninput=e=>{q=e.target.value;wl()};$('#al').onchange=e=>{allm=e.target.checked;wl()};wl()}
+function wl(){const k=q.toLowerCase(),L=S.assignments.filter(a=>(allm||a.classId==cur)&&(a.title+' '+a.note+' '+lab(cls(a.classId))).toLowerCase().includes(k)).sort((a,b)=>(b.date>a.date)-(b.date<a.date));
+$('#wl').innerHTML=L.length?`<div class="grid">${L.map(a=>`<div class="card click" onclick="asgModal('${a.id}')"><div class="thumb" style="${a.fileId?`background-image:url(${thumb(a.fileId,500)})`:''}">${a.fileId?'':'📄'}</div><div class="pad"><b>${esc(a.title)}</b><div class="mut" style="font-size:13px">${allm?esc(lab(cls(a.classId)))+'<br>':''}${esc(a.date)} · เต็ม ${a.max}</div></div></div>`).join('')}</div>`:empty(q?'ไม่พบใบงานที่ค้นหา':'ยังไม่มีใบงาน','กด "ใบงานใหม่" เพื่อเพิ่มพร้อมรูปตัวอย่าง')}
+function shrink(f){return new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1600/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.82).split(',')[1])};i.src=URL.createObjectURL(f)})}
+function asgModal(id){const a=S.assignments.find(x=>x.id==id)||{classId:cur,title:'',max:10,date:today(),note:'',fileId:''};let img=null;
+modal(`<h2>${id?'แก้ไขใบงาน':'ใบงานใหม่'}</h2><div class="f"><label>วิชา/ห้อง</label><select id="ac">${S.classes.map(c=>`<option value="${c.id}" ${c.id==a.classId?'selected':''}>${esc(lab(c))}</option>`).join('')}</select></div>
+<div class="f"><label>ชื่อใบงาน</label><input id="at" value="${esc(a.title)}"></div>
+<div class="r2"><div class="f"><label>คะแนนเต็ม</label><input id="am" type="number" min="0" step="any" value="${a.max}"></div><div class="f"><label>วันที่</label><input id="ad" type="date" value="${esc(a.date)}"></div></div>
+<div class="f"><label>หมายเหตุ</label><input id="an" value="${esc(a.note)}"></div>
+<div class="f"><label>รูปตัวอย่างใบงาน</label><input id="af" type="file" accept=".jpg,.jpeg,.png,.webp,.gif"><div id="pv">${a.fileId?`<a href="${DRV}file/d/${a.fileId}/view" target="_blank"><img src="${thumb(a.fileId,900)}"></a>`:''}</div></div>
+<div class="acts">${id?'<button class="btn r" id="dl">ลบ</button>':''}<span style="flex:1"></span><button class="btn g" onclick="closeM()">ยกเลิก</button><button class="btn" id="ok">บันทึก</button></div>`);
+$('#af').onchange=async e=>{const f=e.target.files[0];if(!f)return;img={data:await shrink(f),mime:'image/jpeg',name:($('#at').value||'worksheet')+'.jpg'};$('#pv').innerHTML=`<img src="data:image/jpeg;base64,${img.data}">`};
+$('#ok').onclick=async()=>{const t=$('#at').value.trim();if(!t)return toast('กรุณาใส่ชื่อใบงาน',1);
+const n={id:a.id||'a'+Date.now().toString(36),classId:$('#ac').value,title:t,max:+$('#am').value||0,date:$('#ad').value,fileId:a.fileId||'',note:$('#an').value};
+$('#ok').disabled=true;toast('กำลังบันทึก…');try{const r=await api('saveAssignment',n,img);r.max=+r.max;const i=S.assignments.findIndex(x=>x.id==n.id);i<0?S.assignments.push(r):S.assignments[i]=r;closeM();render();toast('บันทึกใบงานแล้ว')}catch(e){$('#ok').disabled=false}};
+if(id)$('#dl').onclick=async()=>{if(!confirm('ลบใบงานนี้พร้อมคะแนนทั้งหมดของใบงาน?'))return;try{await api('deleteAssignment',id);S.assignments=S.assignments.filter(x=>x.id!=id);closeM();render();toast('ลบใบงานแล้ว')}catch(e){}}}
+
+function sumV(){const T=totals(cur),A=asg(cur),b=$('#body');if(!T.length||!A.length)return b.innerHTML=empty('ยังไม่มีข้อมูลให้สรุป','ต้องมีทั้งรายชื่อนักเรียนและใบงาน');
+const R=[...T].sort((a,b)=>b.t-a.t),rk={};R.forEach((r,i)=>rk[r.code]=i&&r.t==R[i-1].t?rk[R[i-1].code]:i+1);
+const ps=T.map(x=>x.p),av=ps.reduce((a,b)=>a+b,0)/ps.length,avg=a=>{const v=T.map(s=>sc[a.id+'|'+s.code]).filter(x=>x!=null);return v.length?P(v.reduce((x,y)=>x+y,0)/v.length):'-'};
+b.innerHTML=`<div class="stats">${[['ค่าเฉลี่ยร้อยละ',P(av)+'%'],['สูงสุด',P(Math.max(...ps))+'%'],['ต่ำสุด',P(Math.min(...ps))+'%'],['คะแนนเต็มรวม',P(T[0].mx)]].map(([l,v])=>`<div class="card pad"><span class="mut">${l}</span><b>${v}</b></div>`).join('')}</div>
+<div class="card tw" style="margin-top:14px"><table><thead><tr><th>เลขที่</th><th class="sk">ชื่อ-สกุล</th>${A.map(a=>`<th>${esc(a.title)} <span class="mut">/${a.max}</span></th>`).join('')}<th>รวม</th><th>ร้อยละ</th><th>อันดับ</th></tr></thead><tbody>${T.map(s=>`<tr><td>${s.no}</td><td class="sk">${esc(s.name)}</td>${A.map(a=>{const v=sc[a.id+'|'+s.code];return `<td>${v==null?'<span class="mut">-</span>':P(v)}</td>`}).join('')}<td><b>${P(s.t)}</b> <span class="mut">/ ${P(s.mx)}</span></td><td><span class="bar"><i style="width:${Math.min(100,s.p)}%"></i></span>${P(s.p)}%</td><td>${rk[s.code]}</td></tr>`).join('')}
+<tr><td></td><td class="sk"><b>ค่าเฉลี่ยรายใบงาน</b></td>${A.map(a=>`<td><b>${avg(a)}</b></td>`).join('')}<td></td><td></td><td></td></tr></tbody></table></div>
+<div class="mut" style="margin:10px 4px;font-size:13px">ช่องที่ยังไม่มีคะแนนนับเป็น 0 ในคะแนนรวม · ข้อมูลทั้งหมดอยู่ในชีต Scores ของ Google Sheet ใช้ทำสูตรเพิ่มเติมได้</div>`}
+
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10),fd=d=>d.split('-').reverse().join('/');
+function attDates(cid){const o={};Object.keys(att).forEach(k=>{const p=k.split('|');if(p[0]==cid)o[p[1]]=1});return Object.keys(o).sort()}
+function attRows(cid){const D=attDates(cid);return stu(cid).map(s=>{const c={};ST.forEach(t=>c[t]=0);D.forEach(d=>{const v=att[cid+'|'+d+'|'+s.code];if(v)c[v]++});return{s,c,p:D.length?(c['มา']+c['สาย'])/D.length*100:0}})}
+function attV(){const b=$('#body');if(!stu(cur).length)return b.innerHTML=empty('ยังไม่มีรายชื่อนักเรียน','ไปที่แท็บ "รายชื่อนักเรียน" ก่อน');
+b.innerHTML=`<div class="tabs" style="margin-bottom:14px">${[['day','เช็คชื่อรายวัน'],['sum','สรุปเวลาเรียน']].map(([k,v])=>`<button class="${amode==k?'on':''}" onclick="setAm('${k}')">${v}</button>`).join('')}</div><div id="ab"></div>`;amode=='day'?dayV():attSum()}
+function setAm(k){if(!guard())return;amode=k;attV()}
+function dayLoad(){cs={};adt=false;stu(cur).forEach(s=>{const v=att[cur+'|'+adate+'|'+s.code];if(v)cs[s.code]=v})}
+function dayV(){$('#ab').innerHTML=`<div class="top"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><input type="date" id="dt" value="${adate}" style="width:auto"><button class="btn g" onclick="allSt('มา')">มาทั้งหมด</button><button class="btn g" onclick="allSt('')">ล้างทั้งหมด</button></div><div id="cnt" class="mut"></div><button class="btn" id="asv" onclick="saveAtt()">บันทึกเวลาเรียน</button></div><div class="card tw" id="alw"></div>`;
+$('#dt').onchange=e=>{if(!guard()){e.target.value=adate;return}adate=e.target.value||today();dayLoad();dl2()};dayLoad();dl2()}
+function dl2(){const w=$('#alw'),y=w.scrollTop;w.innerHTML=`<table><thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th></tr></thead><tbody>${stu(cur).map((s,i)=>`<tr><td>${s.no}</td><td>${esc(s.name)}</td><td>${ST.map((t,j)=>`<button class="sb s${j} ${cs[s.code]==t?'on':''}" onclick="setSt(${i},'${t}')">${t}</button>`).join(' ')}</td></tr>`).join('')}</tbody></table>`;w.scrollTop=y;
+$('#cnt').textContent=ST.map(t=>t+' '+Object.values(cs).filter(v=>v==t).length).join(' · ')+' · ยังไม่เช็ค '+(stu(cur).length-Object.keys(cs).length)}
+function setSt(i,t){const c=stu(cur)[i].code;if(cs[c]==t)delete cs[c];else cs[c]=t;adt=true;dl2()}
+function allSt(t){cs={};if(t)stu(cur).forEach(s=>cs[s.code]=t);adt=true;dl2()}
+async function saveAtt(){const T=stu(cur),items=T.filter(s=>cs[s.code]).map(s=>({code:s.code,status:cs[s.code]}));$('#asv').disabled=true;
+try{await api('saveAttendance',cur,adate,items);T.forEach(s=>{const k=cur+'|'+adate+'|'+s.code;if(cs[s.code])att[k]=cs[s.code];else delete att[k]});adt=false;toast('บันทึกเวลาเรียนวันที่ '+fd(adate)+' แล้ว')}catch(e){}$('#asv').disabled=false}
+function attSum(){const D=attDates(cur),R=attRows(cur),b=$('#ab');if(!D.length)return b.innerHTML=empty('ยังไม่มีบันทึกเวลาเรียน','เลือก "เช็คชื่อรายวัน" เพื่อเริ่มบันทึก');
+const chip=v=>{const j=ST.indexOf(v);return j<0?'<span class="mut">-</span>':`<span class="sb s${j} on" style="padding:1px 9px;cursor:default">${v}</span>`};
+b.innerHTML=`<div class="card tw"><table><thead><tr><th>เลขที่</th><th class="sk">ชื่อ-สกุล</th>${D.map(d=>`<th>${d.slice(8)}-${d.slice(5,7)}</th>`).join('')}${ST.map(t=>`<th>${t}</th>`).join('')}<th>เข้าเรียน</th></tr></thead><tbody>${R.map(r=>`<tr><td>${r.s.no}</td><td class="sk">${esc(r.s.name)}</td>${D.map(d=>`<td>${chip(att[cur+'|'+d+'|'+r.s.code])}</td>`).join('')}${ST.map(t=>`<td>${r.c[t]}</td>`).join('')}<td><span class="bar"><i style="width:${Math.min(100,r.p)}%"></i></span>${P(r.p)}%</td></tr>`).join('')}</tbody></table></div><div class="mut" style="margin:10px 4px;font-size:13px">ร้อยละเข้าเรียน = (มา + สาย) ÷ จำนวนวันที่มีการเช็คชื่อ (${D.length} วัน)</div>`}
+
+function saveCsv(name,rows){const t='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v==null?'':v).split('"').join('""')+'"').join(',')).join('\n');
+const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download=name+'.csv';document.body.appendChild(a);a.click();a.remove();toast('ส่งออกไฟล์ '+name+'.csv แล้ว')}
+function exportM(){const one=cur?`<button class="btn" onclick="ex('sc',1)">คะแนน · ${esc(lab(cls(cur)))}</button><button class="btn" onclick="ex('at',1)">เวลาเรียน · ${esc(lab(cls(cur)))}</button>`:'';
+modal(`<h2>ส่งออกไฟล์ CSV</h2><p class="mut" style="margin-top:0">เปิดด้วย Excel หรือ Google Sheets ได้ รองรับภาษาไทย</p><div style="display:grid;gap:8px">${one}<button class="btn g" onclick="ex('sc',0)">คะแนน · ทุกวิชา/ห้อง (ไฟล์เดียว)</button><button class="btn g" onclick="ex('at',0)">เวลาเรียน · ทุกวิชา/ห้อง (ไฟล์เดียว)</button></div><div class="acts"><span style="flex:1"></span><button class="btn g" onclick="closeM()">ปิด</button></div>`)}
+function ex(k,one){const C=one?[cls(cur)]:S.classes,nm=n=>n.split('/').join('-'),R=[];
+if(k=='sc'){if(one){const c=C[0],A=asg(c.id);return saveCsv('คะแนน '+nm(lab(c)),[['เลขที่','รหัส','ชื่อ-สกุล'].concat(A.map(a=>a.title+' (เต็ม '+a.max+')'),['รวม','คะแนนเต็มรวม','ร้อยละ'])].concat(totals(c.id).map(s=>[s.no,s.code,s.name].concat(A.map(a=>{const v=sc[a.id+'|'+s.code];return v==null?'':v}),[s.t,s.mx,s.p.toFixed(1)]))))}
+R.push(['วิชา','ห้อง','เลขที่','รหัส','ชื่อ-สกุล','ใบงาน','วันที่','คะแนนเต็ม','คะแนน']);C.forEach(c=>asg(c.id).forEach(a=>stu(c.id).forEach(s=>{const v=sc[a.id+'|'+s.code];R.push([c.subject,c.room,s.no,s.code,s.name,a.title,a.date,a.max,v==null?'':v])})));return saveCsv('คะแนนทุกห้อง',R)}
+if(one){const c=C[0],D=attDates(c.id);return saveCsv('เวลาเรียน '+nm(lab(c)),[['เลขที่','รหัส','ชื่อ-สกุล'].concat(D.map(d=>fd(d)),ST,['ร้อยละเข้าเรียน'])].concat(attRows(c.id).map(r=>[r.s.no,r.s.code,r.s.name].concat(D.map(d=>att[c.id+'|'+d+'|'+r.s.code]||''),ST.map(t=>r.c[t]),[r.p.toFixed(1)]))))}
+R.push(['วิชา','ห้อง','เลขที่','รหัส','ชื่อ-สกุล','วันที่','สถานะ']);C.forEach(c=>attDates(c.id).forEach(d=>stu(c.id).forEach(s=>{const v=att[c.id+'|'+d+'|'+s.code];if(v)R.push([c.subject,c.room,s.no,s.code,s.name,d,v])})));saveCsv('เวลาเรียนทุกห้อง',R)}
+
+function stuV(){$('#body').innerHTML=`<div class="card pad"><p class="mut" style="margin-top:0">วางรายชื่อจาก Excel/Sheets ได้เลย 1 บรรทัดต่อ 1 คน รูปแบบ <b>เลขที่ [Tab] รหัส [Tab] ชื่อ-สกุล</b> (หรือ รหัส+ชื่อ / ชื่ออย่างเดียว)</p><textarea id="st" rows="14" style="font-family:monospace">${esc(stu(cur).map(s=>[s.no,s.code,s.name].join('\t')).join('\n'))}</textarea><div style="margin-top:12px"><button class="btn" onclick="saveStu()">บันทึกรายชื่อ</button></div></div>`}
+async function saveStu(){const L=$('#st').value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map((l,i)=>{const p=l.split(/\t|,/).map(x=>x.trim());
+return p.length>=3?{no:+p[0]||i+1,code:p[1],name:p.slice(2).join(' ')}:p.length==2?{no:i+1,code:p[0],name:p[1]}:{no:i+1,code:String(i+1),name:p[0]}});
+if(new Set(L.map(s=>s.code)).size<L.length)return toast('มีรหัสนักเรียนซ้ำกัน',1);
+try{await api('saveStudents',cur,L);S.students=S.students.filter(s=>s.classId!=cur).concat(L.map(s=>Object.assign({classId:cur},s)));render();toast(`บันทึกรายชื่อ ${L.length} คนแล้ว`)}catch(e){}}
+
+function classModal(id){const c=cls(id)||{subject:'',room:''};
+modal(`<h2>${id?'แก้ไข':'เพิ่ม'}วิชา/ห้อง</h2><div class="f"><label>วิชา</label><input id="cs" list="sl" value="${esc(c.subject)}" placeholder="เช่น คณิตศาสตร์ ม.2"><datalist id="sl">${[...new Set(S.classes.map(x=>x.subject))].map(s=>`<option value="${esc(s)}">`).join('')}</datalist></div><div class="f"><label>ห้อง</label><input id="cr" value="${esc(c.room)}" placeholder="เช่น 2/1"></div>
+<div class="acts">${id?'<button class="btn r" id="cd">ลบ</button>':''}<span style="flex:1"></span><button class="btn g" onclick="closeM()">ยกเลิก</button><button class="btn" id="ok">บันทึก</button></div>`);
+$('#ok').onclick=async()=>{const n={id:id||'c'+Date.now().toString(36),subject:$('#cs').value.trim(),room:$('#cr').value.trim()};if(!n.subject||!n.room)return toast('กรุณากรอกวิชาและห้อง',1);
+try{await api('saveClass',n);const i=S.classes.findIndex(x=>x.id==n.id);i<0?S.classes.push(n):S.classes[i]=n;cur=n.id;closeM();render()}catch(e){}};
+if(id)$('#cd').onclick=async()=>{if(!confirm('ลบวิชา/ห้องนี้ พร้อมรายชื่อ ใบงาน และคะแนนทั้งหมด?'))return;try{await api('deleteClass',id);const ids=asg(id).map(a=>a.id);S.classes=S.classes.filter(x=>x.id!=id);S.students=S.students.filter(s=>s.classId!=id);S.assignments=S.assignments.filter(a=>a.classId!=id);dirty={};bar();cur=null;closeM();render()}catch(e){}}}
+function modal(h){$('#m').innerHTML=`<div class="card box">${h}</div>`;$('#m').className='show'}
+function closeM(){$('#m').className='';$('#m').innerHTML=''}
+$('#m').onclick=e=>{if(e.target.id=='m')closeM()};
+load();
+</script></body></html>
